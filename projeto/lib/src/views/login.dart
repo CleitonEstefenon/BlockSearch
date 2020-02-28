@@ -7,27 +7,36 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  var loginBloc = new LoginBloc();
+
+  LoginBloc bloc = new LoginBloc();
+  
+  GlobalKey<FormState> key = new GlobalKey();
+  bool validate = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Form(
-        key: null,
+        key: key,
+        autovalidate: validate,
         child: SingleChildScrollView(
           child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch, 
             children: <Widget>[
-              Image.asset(
-                "images/logo.png",
-                width: double.maxFinite,
-                height: 200,
+              Padding(
+                padding: EdgeInsets.only(top: 50),
+                child: Image.asset(
+                  "images/logo.png",
+                  width: double.maxFinite,
+                  height: 200,
+                ),
               ),
               Padding(
                 padding: EdgeInsets.all(20),
                 child: TextFormField(
-                  controller: loginBloc.emailController,
+                  controller: bloc.emailController,
+                  validator: bloc.validateEmail,
                   decoration: InputDecoration(
                     labelText: "E-mail",
                     border: OutlineInputBorder()
@@ -38,8 +47,9 @@ class _LoginState extends State<Login> {
               Padding(
                 padding: EdgeInsets.all(20),
                 child: TextFormField(
+                  controller: bloc.passwordController,
+                  validator: bloc.validatePassword,
                   obscureText: true,
-                  controller: loginBloc.passwordController,
                   decoration: InputDecoration(
                     labelText: "Senha",
                     border: OutlineInputBorder()
@@ -57,11 +67,14 @@ class _LoginState extends State<Login> {
                     style: TextStyle(color: Colors.white),
                   ),
                   onPressed: () {
-                    setState(() {
-                      if(loginBloc.fazerLogin()) {
-                        print('LOGIN EFETUADO COM SUCESSO!');
-                      }
-                    });
+                    if (key.currentState.validate()) {
+                      key.currentState.save();
+                      bloc.validateLogin();
+                    } else {
+                      setState(() {
+                        validate = true;
+                      });
+                    }
                   },
                 ),
               ),
