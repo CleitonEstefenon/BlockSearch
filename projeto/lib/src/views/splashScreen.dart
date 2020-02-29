@@ -77,8 +77,8 @@ class SplashScreenState extends State<SplashScreen> {
                       ),
                       Text(
                         "v1.0.0",
-                        style: TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(              
+                          color: Color(0x8AFFFFFF),
                           fontSize: 14,
                           fontWeight: FontWeight.w600
                         ),
