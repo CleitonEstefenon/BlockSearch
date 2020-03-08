@@ -52,12 +52,11 @@ class SplashScreenState extends State<SplashScreen> {
                         padding: EdgeInsets.only(top: 10.0),
                       ),
                       Text(
-                        "Blocksearch",
+                        "BLOCKSHARE",
                         style: TextStyle(
-                          fontFamily: 'Parisienne',
+                          fontFamily: 'Lena',
                           color: Colors.white,
                           fontSize: 50.0,
-                          fontWeight: FontWeight.bold,
                           //fontFamily: 'RobotoMono'
                         ),
                       )

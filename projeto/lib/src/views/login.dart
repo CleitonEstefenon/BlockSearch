@@ -55,14 +55,18 @@ class _LoginState extends State<Login> {
           autovalidate: validate,
           child: SingleChildScrollView(
             child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch, 
+              crossAxisAlignment: CrossAxisAlignment.stretch, 
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.only(top: 50),
+                  padding: EdgeInsets.only(
+                    top: 50,
+                    right: 50,
+                    left: 50,
+                  ),
                   child: Image.asset(
                     "images/logo.png",
-                    width: double.maxFinite,
-                    height: 200,
+                    width: 150,
+                    height: 150,
                   ),
                 ),
                 Padding(

@@ -59,14 +59,14 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Parisienne
+    - family: Lena
       fonts:
-        - asset: fonts/Parisienne_Regular.ttf
+        - asset: fonts/Lena.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
-  #   - family: Trajan Pro
+  # - family: Lena
   #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/Lena.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   #
