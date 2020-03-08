@@ -54,9 +54,11 @@ class SplashScreenState extends State<SplashScreen> {
                       Text(
                         "Blocksearch",
                         style: TextStyle(
+                          fontFamily: 'Parisienne',
                           color: Colors.white,
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.bold
+                          fontSize: 50.0,
+                          fontWeight: FontWeight.bold,
+                          //fontFamily: 'RobotoMono'
                         ),
                       )
                     ],
