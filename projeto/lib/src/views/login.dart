@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:projeto/src/blocs/login.bloc.dart';
+import 'package:projeto/src/views/home.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -72,7 +73,8 @@ class _LoginState extends State<Login> {
                 Padding(
                   padding: EdgeInsets.all(20),
                   child: TextFormField(
-                    controller: bloc.emailController,
+                    controller: TextEditingController(text: 'cledianoestefenon@gmail.com'),                   
+                    //controller: bloc.emailController,
                     validator: bloc.validateEmail,
                     decoration: InputDecoration(
                       labelText: "E-mail",
@@ -84,7 +86,8 @@ class _LoginState extends State<Login> {
                 Padding(
                   padding: EdgeInsets.all(20),
                   child: TextFormField(
-                    controller: bloc.passwordController,
+                    controller: TextEditingController(text: '123'),
+                    //controller: bloc.passwordController,
                     validator: bloc.validatePassword,
                     obscureText: true,
                     decoration: InputDecoration(
@@ -105,8 +108,9 @@ class _LoginState extends State<Login> {
                     ),
                     onPressed: () {
                       if (key.currentState.validate()) {
-                        key.currentState.save();
-                        bloc.validateLogin();
+                        key.currentState.save();                
+                        //bloc.validateLogin();
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
                       } else {
                         setState(() {
                           validate = true;

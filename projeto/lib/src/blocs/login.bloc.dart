@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projeto/src/services/loginApi.dart';
 
+
 class LoginBloc {
 
   LoginApi loginApi = new LoginApi();
