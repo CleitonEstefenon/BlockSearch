@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'floatButtons.dart';
 
 class Home extends StatefulWidget {
@@ -25,22 +24,17 @@ class _HomeState extends State<Home> {
           ),
         )
       ),
-      body: Column(        
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(100),            
-            child: Text(
-              "Menu pizza aqui",
-              style: TextStyle(
-                color: Colors.black
-              ),
-            ),
-          )
-        ],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'Graficos aqui'
+            )
+          ],
+        ),
       ),
       floatingActionButton: FloatButton(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
