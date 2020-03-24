@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:projeto/src/services/loginApi.dart';
 
-
 class LoginBloc {
-
   LoginApi loginApi = new LoginApi();
 
   var emailController = new TextEditingController();
   var passwordController = new TextEditingController();
 
   String validateEmail(String text) {
-    String regularExpression = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    String regularExpression =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
     RegExp regExp = new RegExp(regularExpression);
 
     if (text.length == 0) {
       return "Email é obrigatório";
-    } else if(!regExp.hasMatch(text)){
+    } else if (!regExp.hasMatch(text)) {
       return "Email inválido";
-    }else {
+    } else {
       return null;
     }
   }
@@ -25,22 +24,16 @@ class LoginBloc {
   String validatePassword(String text) {
     if (text.length == 0) {
       return "Senha é obrigatória";
-    } 
+    }
     return null;
   }
 
-  Future<bool> validateLogin() async {
+  bool isAuthenticated() {
+    LoginApi.validationLoginApi(emailController.text, passwordController.text)
+        .then((response) {
+          //print(response.statusCode);
+        });
 
-    var response = await LoginApi.validationLoginApi(
-      emailController.text, 
-      passwordController.text
-    );
-
-    if(response) {
-      print('Sucesso');
-    }
-
-    return true;
+        return null;
   }
-
 }

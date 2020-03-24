@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:projeto/src/blocs/login.bloc.dart';
-import 'package:projeto/src/views/home.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -13,6 +12,8 @@ class _LoginState extends State<Login> {
   LoginBloc bloc = new LoginBloc();
   
   GlobalKey<FormState> key = new GlobalKey();
+  
+  final _scaffoldState = GlobalKey<ScaffoldState>();
 
   bool validate = false;
 
@@ -44,12 +45,22 @@ class _LoginState extends State<Login> {
     );
   }
 
+  void exibirMsg(String msg){
+    _scaffoldState.currentState.showSnackBar(
+      SnackBar(
+        content: Text("$msg"),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _endApplication,
       child: Scaffold(
+        key: _scaffoldState,
         backgroundColor: Colors.white,
         body: Form(
           key: key,
@@ -73,8 +84,8 @@ class _LoginState extends State<Login> {
                 Padding(
                   padding: EdgeInsets.all(20),
                   child: TextFormField(
-                    controller: TextEditingController(text: 'cledianoestefenon@gmail.com'),                   
-                    //controller: bloc.emailController,
+                    //controller: TextEditingController(text: 'cleitonestefenon@gmail.com'),                  
+                    controller: bloc.emailController,
                     validator: bloc.validateEmail,
                     decoration: InputDecoration(
                       labelText: "E-mail",
@@ -86,8 +97,8 @@ class _LoginState extends State<Login> {
                 Padding(
                   padding: EdgeInsets.all(20),
                   child: TextFormField(
-                    controller: TextEditingController(text: '123'),
-                    //controller: bloc.passwordController,
+                    //controller: TextEditingController(text: '123'),
+                    controller: bloc.passwordController,
                     validator: bloc.validatePassword,
                     obscureText: true,
                     decoration: InputDecoration(
@@ -108,9 +119,14 @@ class _LoginState extends State<Login> {
                     ),
                     onPressed: () {
                       if (key.currentState.validate()) {
-                        key.currentState.save();                
-                        //bloc.validateLogin();
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+                        key.currentState.save();
+                        bloc.isAuthenticated(); //BIXO BURRO
+                        // if(bloc.isAuthenticated()) {
+                        //   Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+                        // } else {
+                        //   print('ERROR: ------------>>>>>>   $err');
+                        // }
+
                       } else {
                         setState(() {
                           validate = true;

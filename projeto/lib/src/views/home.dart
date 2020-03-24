@@ -9,7 +9,6 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-//O SingleTickerProviderStateMixin vai
 class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
