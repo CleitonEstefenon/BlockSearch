@@ -2,50 +2,48 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:projeto/src/blocs/login.bloc.dart';
 
+import 'home.dart';
+
 class Login extends StatefulWidget {
   @override
   _LoginState createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
-
   LoginBloc bloc = new LoginBloc();
-  
+
   GlobalKey<FormState> key = new GlobalKey();
-  
+
   final _scaffoldState = GlobalKey<ScaffoldState>();
 
   bool validate = false;
 
-
   Future<bool> _endApplication() async {
     return showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Text('Sair do App?'),
-        content: Text('Você deseja SAIR da aplicação?'),
-        actions: <Widget>[
-          RaisedButton(
-            color: Colors.blue,
-            child: Text('Não'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            }            
-          ),
-          RaisedButton(
-            color: Colors.blue,
-            child: Text('Sim'),
-            onPressed: () { 
-              SystemNavigator.pop();
-            },
-          ),
-        ],
-      )
-    );
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+              title: Text('Sair do App?'),
+              content: Text('Você deseja SAIR da aplicação?'),
+              actions: <Widget>[
+                RaisedButton(
+                    color: Colors.blue,
+                    child: Text('Não'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    }),
+                RaisedButton(
+                  color: Colors.blue,
+                  child: Text('Sim'),
+                  onPressed: () {
+                    SystemNavigator.pop();
+                  },
+                ),
+              ],
+            ));
   }
 
-  void exibirMsg(String msg){
+  void showMessage(String msg) {
     _scaffoldState.currentState.showSnackBar(
       SnackBar(
         content: Text("$msg"),
@@ -54,6 +52,9 @@ class _LoginState extends State<Login> {
     );
   }
 
+  void navigateToHome() {
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home()));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +68,7 @@ class _LoginState extends State<Login> {
           autovalidate: validate,
           child: SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch, 
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(
@@ -84,33 +85,27 @@ class _LoginState extends State<Login> {
                 Padding(
                   padding: EdgeInsets.all(20),
                   child: TextFormField(
-                    //controller: TextEditingController(text: 'cleitonestefenon@gmail.com'),                  
                     controller: bloc.emailController,
                     validator: bloc.validateEmail,
                     decoration: InputDecoration(
-                      labelText: "E-mail",
-                      border: OutlineInputBorder()
-                    ),
+                        labelText: "E-mail", border: OutlineInputBorder()),
                     keyboardType: TextInputType.emailAddress,
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.all(20),
                   child: TextFormField(
-                    //controller: TextEditingController(text: '123'),
                     controller: bloc.passwordController,
                     validator: bloc.validatePassword,
                     obscureText: true,
                     decoration: InputDecoration(
-                      labelText: "Senha",
-                      border: OutlineInputBorder()
-                    ),
+                        labelText: "Senha", border: OutlineInputBorder()),
                     keyboardType: TextInputType.text,
                   ),
                 ),
                 Padding(
                   padding: EdgeInsets.all(20),
-                  child: RaisedButton(
+                 child: RaisedButton(
                     padding: EdgeInsets.all(20),
                     color: Theme.of(context).primaryColor,
                     child: Text(
@@ -120,13 +115,14 @@ class _LoginState extends State<Login> {
                     onPressed: () {
                       if (key.currentState.validate()) {
                         key.currentState.save();
-                        bloc.isAuthenticated(); //BIXO BURRO
-                        // if(bloc.isAuthenticated()) {
-                        //   Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
-                        // } else {
-                        //   print('ERROR: ------------>>>>>>   $err');
-                        // }
 
+                        bloc.authenticated().then((isAuthenticated) {
+                          if (isAuthenticated) {
+                            navigateToHome();
+                          } else {
+                            showMessage('Nenhum usuário encontrado.');
+                          }
+                        });
                       } else {
                         setState(() {
                           validate = true;

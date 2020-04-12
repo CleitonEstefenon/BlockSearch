@@ -28,12 +28,13 @@ class LoginBloc {
     return null;
   }
 
-  bool isAuthenticated() {
-    LoginApi.validationLoginApi(emailController.text, passwordController.text)
-        .then((response) {
-          //print(response.statusCode);
-        });
-
-        return null;
-  }
+  Future<bool> authenticated() async =>
+      LoginApi.login(emailController.text, passwordController.text)
+          .then((user) {
+        if (user.statusCode == 200) {
+          return true;
+        } else {
+          return false;
+        }
+      });
 }

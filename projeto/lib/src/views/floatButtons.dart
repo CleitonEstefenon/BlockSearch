@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:projeto/src/views/register.dart';
+import 'package:projeto/src/views/search-document.dart';
 
 class FloatButton extends StatefulWidget {
   final Function() onPressed;
@@ -74,30 +76,19 @@ class _FloatButtonState extends State<FloatButton>
     return Container(
       child: FloatingActionButton(
         heroTag: null,
-        onPressed: null,
+        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Register())),
         tooltip: 'Add',
         child: Icon(Icons.plus_one),
       ),
     );
   }
 
-  Widget image() {
+  Widget search() {
     return Container(
       child: FloatingActionButton(
         heroTag: null,
-        onPressed: null,
-        tooltip: 'Image',
-        child: Icon(Icons.contacts),
-      ),
-    );
-  }
-
-  Widget inbox() {
-    return Container(
-      child: FloatingActionButton(
-        heroTag: null,
-        onPressed: null,
-        tooltip: 'Inbox',
+        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SearchDocument())),
+        tooltip: 'Search',
         child: Icon(Icons.search),
       ),
     );
@@ -126,7 +117,7 @@ class _FloatButtonState extends State<FloatButton>
         Transform(
           transform: Matrix4.translationValues(
             0.0,
-            _translateButton.value * 3.0,
+            _translateButton.value * 2.0,
             0.0,
           ),
           child: add(),
@@ -134,18 +125,10 @@ class _FloatButtonState extends State<FloatButton>
         Transform(
           transform: Matrix4.translationValues(
             0.0,
-            _translateButton.value * 2.0,
-            0.0,
-          ),
-          child: image(),
-        ),
-        Transform(
-          transform: Matrix4.translationValues(
-            0.0,
             _translateButton.value,
             0.0,
           ),
-          child: inbox(),
+          child: search(),
         ),
         toggle(),
       ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:projeto/src/views/transaction-list.dart';
 import 'floatButtons.dart';
 
 class Home extends StatefulWidget {
@@ -27,9 +28,7 @@ class _HomeState extends State<Home> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'Graficos aqui'
-            )
+            TransactionList()
           ],
         ),
       ),
