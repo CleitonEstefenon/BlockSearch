@@ -115,7 +115,6 @@ class _LoginState extends State<Login> {
                     onPressed: () {
                       if (key.currentState.validate()) {
                         key.currentState.save();
-
                         bloc.authenticated().then((isAuthenticated) {
                           if (isAuthenticated) {
                             navigateToHome();

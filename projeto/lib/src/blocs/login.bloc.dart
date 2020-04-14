@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:projeto/src/models/SharedPrefUser.dart';
 import 'package:projeto/src/services/loginApi.dart';
 
 class LoginBloc {
@@ -32,6 +33,7 @@ class LoginBloc {
       LoginApi.login(emailController.text, passwordController.text)
           .then((user) {
         if (user.statusCode == 200) {
+          addUserPreferences(user.token);
           return true;
         } else {
           return false;
