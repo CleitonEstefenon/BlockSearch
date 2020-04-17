@@ -18,120 +18,123 @@ class _LoginState extends State<Login> {
 
   bool validate = false;
 
-  Future<bool> _endApplication() async {
-    return showDialog<bool>(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => AlertDialog(
-              title: Text('Sair do App?'),
-              content: Text('Você deseja SAIR da aplicação?'),
-              actions: <Widget>[
-                RaisedButton(
-                    color: Colors.blue,
-                    child: Text('Não'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    }),
-                RaisedButton(
-                  color: Colors.blue,
-                  child: Text('Sim'),
-                  onPressed: () {
-                    SystemNavigator.pop();
-                  },
-                ),
-              ],
-            ));
-  }
+  bool _loading = false;
 
   void showMessage(String msg) {
     _scaffoldState.currentState.showSnackBar(
       SnackBar(
-        content: Text("$msg"),
+        content: Text(
+          "$msg",
+          textAlign: TextAlign.center,
+        ),
         duration: Duration(seconds: 2),
       ),
     );
   }
 
   void navigateToHome() {
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Home()));
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => Home()));
+  }
+
+  Widget setUpButtonChild() {
+    if (!_loading) {
+      return Padding(
+        padding: const EdgeInsets.all(20),
+        child: Text(
+          "Entrar",
+          style: const TextStyle(color: Colors.white, fontSize: 16.0),
+        ),
+      );
+    } else {
+      return Padding(
+        padding: const EdgeInsets.all(11.2),
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _endApplication,
-      child: Scaffold(
-        key: _scaffoldState,
-        backgroundColor: Colors.white,
-        body: Form(
-          key: key,
-          autovalidate: validate,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(
-                    top: 50,
-                    right: 50,
-                    left: 50,
-                  ),
-                  child: Image.asset(
-                    "images/logo.png",
-                    width: 150,
-                    height: 150,
-                  ),
+    return Scaffold(
+      key: _scaffoldState,
+      backgroundColor: Colors.white,
+      body: Form(
+        key: key,
+        autovalidate: validate,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(
+                  top: 50,
+                  right: 50,
+                  left: 50,
                 ),
-                Padding(
-                  padding: EdgeInsets.all(20),
-                  child: TextFormField(
-                    controller: bloc.emailController,
-                    validator: bloc.validateEmail,
-                    decoration: InputDecoration(
-                        labelText: "E-mail", border: OutlineInputBorder()),
-                    keyboardType: TextInputType.emailAddress,
-                  ),
+                child: Image.asset(
+                  "images/logo.png",
+                  width: 150,
+                  height: 150,
                 ),
-                Padding(
-                  padding: EdgeInsets.all(20),
-                  child: TextFormField(
-                    controller: bloc.passwordController,
-                    validator: bloc.validatePassword,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                        labelText: "Senha", border: OutlineInputBorder()),
-                    keyboardType: TextInputType.text,
-                  ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(20),
+                child: TextFormField(
+                  controller: bloc.emailController,
+                  validator: bloc.validateEmail,
+                  decoration: InputDecoration(
+                      labelText: "E-mail", border: OutlineInputBorder()),
+                  keyboardType: TextInputType.emailAddress,
                 ),
-                Padding(
-                  padding: EdgeInsets.all(20),
-                 child: RaisedButton(
-                    padding: EdgeInsets.all(20),
-                    color: Theme.of(context).primaryColor,
-                    child: Text(
-                      "Entrar",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    onPressed: () {
-                      if (key.currentState.validate()) {
-                        key.currentState.save();
-                        bloc.authenticated().then((isAuthenticated) {
-                          if (isAuthenticated) {
-                            navigateToHome();
-                          } else {
-                            showMessage('Nenhum usuário encontrado.');
-                          }
-                        });
-                      } else {
-                        setState(() {
-                          validate = true;
-                        });
-                      }
-                    },
-                  ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(20),
+                child: TextFormField(
+                  controller: bloc.passwordController,
+                  validator: bloc.validatePassword,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                      labelText: "Senha", border: OutlineInputBorder()),
+                  keyboardType: TextInputType.text,
                 ),
-              ],
-            ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(20),
+                child: MaterialButton(
+                  color: Theme.of(context).primaryColor,
+                  child: setUpButtonChild(),
+                  onPressed: () {
+                    if (key.currentState.validate()) {
+                      key.currentState.save();
+
+                      SystemChannels.textInput.invokeMethod('TextInput.hide');
+
+                      setState(() {
+                        _loading = true;
+                      });
+
+                      bloc.authenticated().then((isAuthenticated) {
+                        if (isAuthenticated) {
+                          navigateToHome();
+                        } else {
+                          showMessage('Nenhum usuário encontrado.');
+                          setState(() {
+                            _loading = false;
+                          });
+                        }
+                      });
+                    } else {
+                      setState(() {
+                        validate = true;
+                      });
+                    }
+                  },
+                ),
+              ),
+            ],
           ),
         ),
       ),
