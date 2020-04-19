@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:local_auth/local_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:projeto/src/helpers/SharedPrefKey.dart';
@@ -16,12 +18,15 @@ class SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     localAuth.canCheckBiometrics.then((canCheckBiometrics) => {
-          addBoolUserPreferences(SharedPreferencesKey.HAS_BIOMETRY, canCheckBiometrics)
+          addBoolUserPreferences(
+                  SharedPreferencesKey.HAS_BIOMETRY, canCheckBiometrics)
               .then((added) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => Login()),
-            );
+            Timer(Duration(milliseconds: 1500), () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => Login()),
+              );
+            });
           })
         });
   }
