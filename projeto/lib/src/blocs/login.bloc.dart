@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:projeto/src/models/SharedPrefUser.dart';
+import 'package:projeto/src/helpers/SharedPrefKey.dart';
+import 'package:projeto/src/helpers/SharedPrefUser.dart';
 import 'package:projeto/src/services/loginApi.dart';
 
 class LoginBloc {
@@ -29,14 +30,42 @@ class LoginBloc {
     return null;
   }
 
-  Future<bool> authenticated() async =>
-      LoginApi.login(emailController.text, passwordController.text)
-          .then((user) {
+  Future<bool> authenticate(bool authWithBiometry) async {
+    Future<bool> isAuthenticated;
+
+    if (authWithBiometry) {
+      String userLogin =
+          await getStringUserPreferences(SharedPreferencesKey.USER_LOGIN);
+      String userPass =
+          await getStringUserPreferences(SharedPreferencesKey.USER_PASS);
+
+      isAuthenticated = LoginApi.login(userLogin, userPass).then((user) {
         if (user.statusCode == 200) {
-          addUserPreferences('token', user.token);
+          addStringUserPreferences(SharedPreferencesKey.TOKEN, user.token);
+          addStringUserPreferences(SharedPreferencesKey.USER_NAME, user.name);
+          addStringUserPreferences(SharedPreferencesKey.USER_LOGIN, user.email);
+          addStringUserPreferences(SharedPreferencesKey.USER_PASS, userPass);
           return true;
         } else {
           return false;
         }
       });
+    } else {
+      isAuthenticated =
+          LoginApi.login(emailController.text, passwordController.text)
+              .then((user) {
+        if (user.statusCode == 200) {
+          addStringUserPreferences(SharedPreferencesKey.TOKEN, user.token);
+          addStringUserPreferences(SharedPreferencesKey.USER_NAME, user.name);
+          addStringUserPreferences(SharedPreferencesKey.USER_LOGIN, user.email);
+          addStringUserPreferences(
+              SharedPreferencesKey.USER_PASS, passwordController.text);
+          return true;
+        } else {
+          return false;
+        }
+      });
+    }
+    return isAuthenticated;
+  }
 }

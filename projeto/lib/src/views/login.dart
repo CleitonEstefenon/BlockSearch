@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_conditional_rendering/conditional.dart';
+import 'package:local_auth/auth_strings.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:projeto/src/blocs/login.bloc.dart';
-import 'package:projeto/src/models/SharedPrefUser.dart';
+import 'package:projeto/src/helpers/SharedPrefKey.dart';
+import 'package:projeto/src/helpers/SharedPrefUser.dart';
 import 'home.dart';
 
 class Login extends StatefulWidget {
@@ -11,14 +15,25 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   LoginBloc bloc = new LoginBloc();
+  final LocalAuthentication _localAuthentication = LocalAuthentication();
 
   GlobalKey<FormState> key = new GlobalKey();
 
   final _scaffoldState = GlobalKey<ScaffoldState>();
 
-  bool validate = false;
-
+  bool _validate = false;
+  bool _hasBiometry = false;
+  bool _switched = false;
+  String _userName = "";
+  String _lastUser = "";
+  bool _loginBiometricOption = false;
   bool _loading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    setUpBiometricOptions();
+  }
 
   void showMessage(String msg) {
     _scaffoldState.currentState.showSnackBar(
@@ -68,44 +83,98 @@ class _LoginState extends State<Login> {
     });
   }
 
-  Future<void> saveBiometric() async {
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(15)),
-          ),
-          title: Text('Gostaria de utilizar sua digital para fazer login?'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Você pode utilizar sua digital para fazer login de forma simples e rápida'),
-              ],
+  void saveBiometryOption() {
+    addBoolUserPreferences(
+        SharedPreferencesKey.LOGIN_BIOMETRIC_OPTION, _switched);
+  }
+
+  void setUpBiometricOptions() {
+    getBoolUserPreferences(SharedPreferencesKey.HAS_BIOMETRY)
+        .then((canCheckBiometrics) {
+      if (canCheckBiometrics) {
+        setState(() {
+          _hasBiometry = true;
+        });
+
+        getStringUserPreferences(SharedPreferencesKey.USER_NAME).then((name) {
+          if (name != null) {
+            setState(() {
+              _userName = name;
+            });
+          }
+        });
+
+        getStringUserPreferences(SharedPreferencesKey.USER_LOGIN).then((user) {
+          if (user != null) {
+            setState(() {
+              _lastUser = user;
+            });
+          }
+        });
+      }
+    });
+
+    getBoolUserPreferences(SharedPreferencesKey.LOGIN_BIOMETRIC_OPTION)
+        .then((loginBiometricOption) {
+      if (loginBiometricOption != null) {
+        setState(() {
+          _loginBiometricOption = loginBiometricOption;
+          _switched = loginBiometricOption;
+        });
+      }
+    });
+  }
+
+  Future<void> _authenticateUserWithBiometry() async {
+    bool isAuthenticated =
+        await _localAuthentication.authenticateWithBiometrics(
+            localizedReason: "Utilize o leitor biométrico para prosseguir",
+            androidAuthStrings: const AndroidAuthMessages(
+              cancelButton: "Cancelar",
+              fingerprintHint: "Toque no sensor de digital",
+              fingerprintNotRecognized: "Não reconhecido",
+              fingerprintRequiredTitle: "Autenticação",
+              fingerprintSuccess: "Autenticado com sucesso",
+              goToSettingsButton: "Biometria não configurada",
+              goToSettingsDescription: "Configurar biometria",
+              signInTitle: "Autenticação",
             ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              color: Colors.purple,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-              child: Text('Não'),
-              onPressed: () {
-                navigateToHome();
-              },
+            iOSAuthStrings: IOSAuthMessages(
+              cancelButton: "Cancelar",
+              goToSettingsButton: "Biometria não configurada",
+              goToSettingsDescription: "Configurar biometria",
+              lockOut: "Bloqueado",
             ),
-            FlatButton(
-              color: Colors.blue,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-              child: Text('Sim'),
-              onPressed: () {
-                navigateToHome();
-              },
-            ),
-          ],
-        );
-      },
-    );
+            useErrorDialogs: true,
+            stickyAuth: true);
+
+    if (isAuthenticated) {
+      navigateToHome();
+    } else {
+      stopLoading();
+    }
+  }
+
+  void login() {
+    initLoading();
+
+    bloc.authenticate(_loginBiometricOption).then((isAuthenticated) {
+      if (isAuthenticated) {
+        if (_loginBiometricOption) {
+          _authenticateUserWithBiometry();
+        } else {
+          navigateToHome();
+        }
+      } else {
+        showMessage('Opss, Usuário ou senha incorretos.');
+        stopLoading();
+        setState(() {
+          _loginBiometricOption = false;
+        });
+      }
+    }).catchError((err) {
+      stopLoading();
+    });
   }
 
   @override
@@ -115,7 +184,7 @@ class _LoginState extends State<Login> {
       backgroundColor: Colors.white,
       body: Form(
         key: key,
-        autovalidate: validate,
+        autovalidate: _validate,
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -132,57 +201,103 @@ class _LoginState extends State<Login> {
                   height: 150,
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.all(20),
-                child: TextFormField(
-                  controller: bloc.emailController,
-                  validator: bloc.validateEmail,
-                  decoration: InputDecoration(
-                      labelText: "E-mail", border: OutlineInputBorder()),
-                  keyboardType: TextInputType.emailAddress,
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(20),
-                child: TextFormField(
-                  controller: bloc.passwordController,
-                  validator: bloc.validatePassword,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                      labelText: "Senha", border: OutlineInputBorder()),
-                  keyboardType: TextInputType.text,
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(20),
-                child: MaterialButton(
-                  color: Theme.of(context).primaryColor,
-                  child: setUpButtonChild(),
-                  onPressed: () {
-                    if (key.currentState.validate()) {
-                      key.currentState.save();
-                      SystemChannels.textInput.invokeMethod('TextInput.hide');
-                      initLoading();
-                      bloc.authenticated().then((isAuthenticated) {
-                        if (isAuthenticated) {
-                          getUserPreferences('usebiometric').then((useBiometric) {
-                            if (useBiometric == null){
-                              saveBiometric();
-                            }else {
-                              navigateToHome();
-                            }                            
+              Conditional.single(
+                context: context,
+                conditionBuilder: (BuildContext context) =>
+                    _loginBiometricOption,
+                widgetBuilder: (BuildContext context) => Container(
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Theme.of(context).primaryColor,
+                        child: Text(_userName.isEmpty
+                            ? ""
+                            : _userName.substring(0, 3).toUpperCase()),
+                      ),
+                      title: Text(_userName.toUpperCase()),
+                      subtitle: Text(_lastUser),
+                      trailing: FlatButton(
+                        child: Text("ALTERAR"),
+                        onPressed: () {
+                          setState(() {
+                            _loginBiometricOption = false;
                           });
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                fallbackBuilder: (BuildContext context) => (Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(20),
+                      child: TextFormField(
+                        controller: bloc.emailController,
+                        validator: bloc.validateEmail,
+                        decoration: InputDecoration(
+                            labelText: "E-mail", border: OutlineInputBorder()),
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(20),
+                      child: TextFormField(
+                        controller: bloc.passwordController,
+                        validator: bloc.validatePassword,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                            labelText: "Senha", border: OutlineInputBorder()),
+                        keyboardType: TextInputType.text,
+                      ),
+                    ),
+                  ],
+                )),
+              ),
+              Column(
+                children: <Widget>[
+                  if (!_loginBiometricOption && _hasBiometry)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      child: SwitchListTile(
+                        title: Text('Utilizar biometria?'),
+                        value: _switched,
+                        onChanged: (bool value) {
+                          setState(() {
+                            _switched = value;
+                          });
+                        },
+                        secondary: const Icon(Icons.fingerprint),
+                      ),
+                    )
+                ],
+              ),
+              Padding(
+                padding: EdgeInsets.all(20),
+                child: IgnorePointer(
+                  ignoring: _loading,
+                  child: MaterialButton(
+                    color: Theme.of(context).primaryColor,
+                    child: setUpButtonChild(),
+                    onPressed: () {
+                      SystemChannels.textInput.invokeMethod('TextInput.hide');
+                      if (_hasBiometry && _loginBiometricOption) {
+                        login();
+                      } else {
+                        if (key.currentState.validate()) {
+                          key.currentState.save();
+
+                          saveBiometryOption(); //Salva no shared_pref o valor do switch "Utilizar biometria?"
+
+                          login();
                         } else {
-                          showMessage('Opss, Usuário ou senha incorretos.');
-                          stopLoading();
+                          setState(() {
+                            _validate = true;
+                          });
                         }
-                      });
-                    } else {
-                      setState(() {
-                        validate = true;
-                      });
-                    }
-                  },
+                      }
+                    },
+                  ),
                 ),
               ),
             ],

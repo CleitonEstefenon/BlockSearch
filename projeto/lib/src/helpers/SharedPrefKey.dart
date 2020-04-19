@@ -1,0 +1,8 @@
+enum SharedPreferencesKey {
+  TOKEN,
+  HAS_BIOMETRY,
+  LOGIN_BIOMETRIC_OPTION,
+  USER_NAME,
+  USER_LOGIN,
+  USER_PASS
+}

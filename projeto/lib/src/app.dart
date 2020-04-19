@@ -9,8 +9,6 @@ class App extends StatelessWidget {
       title: 'Blocksearch',
       theme: ThemeData(
         primaryColor: Color(0xFF003eb5),
-        primaryColorLight: Color(0xFF003eb5),
-        primaryColorDark: Color(0xFF003eb5),
       ),
       home: SplashScreen(),
     );
