@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:projeto/src/blocs/login.bloc.dart';
-
+import 'package:projeto/src/models/SharedPrefUser.dart';
 import 'home.dart';
 
 class Login extends StatefulWidget {
@@ -54,6 +54,58 @@ class _LoginState extends State<Login> {
         ),
       );
     }
+  }
+
+  void initLoading() {
+    setState(() {
+      _loading = true;
+    });
+  }
+
+  void stopLoading() {
+    setState(() {
+      _loading = false;
+    });
+  }
+
+  Future<void> saveBiometric() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(15)),
+          ),
+          title: Text('Gostaria de utilizar sua digital para fazer login?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Você pode utilizar sua digital para fazer login de forma simples e rápida'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              color: Colors.purple,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+              child: Text('Não'),
+              onPressed: () {
+                navigateToHome();
+              },
+            ),
+            FlatButton(
+              color: Colors.blue,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+              child: Text('Sim'),
+              onPressed: () {
+                navigateToHome();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -109,21 +161,20 @@ class _LoginState extends State<Login> {
                   onPressed: () {
                     if (key.currentState.validate()) {
                       key.currentState.save();
-
                       SystemChannels.textInput.invokeMethod('TextInput.hide');
-
-                      setState(() {
-                        _loading = true;
-                      });
-
+                      initLoading();
                       bloc.authenticated().then((isAuthenticated) {
                         if (isAuthenticated) {
-                          navigateToHome();
-                        } else {
-                          showMessage('Nenhum usuário encontrado.');
-                          setState(() {
-                            _loading = false;
+                          getUserPreferences('usebiometric').then((useBiometric) {
+                            if (useBiometric == null){
+                              saveBiometric();
+                            }else {
+                              navigateToHome();
+                            }                            
                           });
+                        } else {
+                          showMessage('Opss, Usuário ou senha incorretos.');
+                          stopLoading();
                         }
                       });
                     } else {

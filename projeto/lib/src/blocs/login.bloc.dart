@@ -33,7 +33,7 @@ class LoginBloc {
       LoginApi.login(emailController.text, passwordController.text)
           .then((user) {
         if (user.statusCode == 200) {
-          addUserPreferences(user.token);
+          addUserPreferences('token', user.token);
           return true;
         } else {
           return false;
