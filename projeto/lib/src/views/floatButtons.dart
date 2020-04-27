@@ -14,6 +14,7 @@ class FloatButton extends StatefulWidget {
 }
 
 class _FloatButtonState extends State<FloatButton>
+
     with SingleTickerProviderStateMixin {
   bool isOpened = false;
   AnimationController _animationController;
@@ -76,7 +77,8 @@ class _FloatButtonState extends State<FloatButton>
     return Container(
       child: FloatingActionButton(
         heroTag: null,
-        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => Register())),
+        onPressed: () => Navigator.push(
+        context, MaterialPageRoute(builder: (context) => Register())),
         tooltip: 'Add',
         child: Icon(Icons.plus_one),
       ),
