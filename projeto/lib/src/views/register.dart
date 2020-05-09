@@ -2,8 +2,6 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
-import 'dart:math' as math;
-
 import 'package:projeto/src/blocs/register.bloc.dart';
 
 class Register extends StatefulWidget {
@@ -18,7 +16,6 @@ class _RegisterState extends State<Register> {
 
   File _file;
   String _fileName = "";
-  int _size = 0;
   bool _loading = false;
   dynamic _registred;
 
@@ -32,7 +29,6 @@ class _RegisterState extends State<Register> {
         setState(() {
           _file = File(relativePath);
           _fileName = path.basename(relativePath);
-          _size = fileSize;
         });
         print('Nome do arquivo ' + _fileName);
       }
@@ -56,13 +52,19 @@ class _RegisterState extends State<Register> {
       _loading = true;
     });
 
-    DocumentBLoc().register(_file.path);
-
-    setState(() {
-      _loading = false;
-      _registred = true;
+    DocumentBLoc().register(_file.path).then((resp) {
+      setState(() {
+        _loading = false;
+        _registred = true;
+      });
+      showMessage("Documento registrado com sucesso!");
+    }).catchError(() {
+      setState(() {
+        _loading = false;
+        _registred = false;
+      });
+      showMessage("Ocorreu um erro ao registrar o documento");
     });
-    showMessage("Documento registrado com sucesso!");
   }
 
   void descartarDocumento() {
@@ -73,7 +75,6 @@ class _RegisterState extends State<Register> {
     setState(() {
       _file = null;
       _fileName = "";
-      _size = 0;
       _loading = false;
       _registred = null;
     });
@@ -94,10 +95,6 @@ class _RegisterState extends State<Register> {
                   ListTile(
                     title: Text(
                       _fileName,
-                      textAlign: TextAlign.center,
-                    ),
-                    subtitle: Text(
-                      "O arquivo carregado possui " + formatBytes(bytes: _size),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -158,18 +155,6 @@ class _RegisterState extends State<Register> {
         ],
       ),
     );
-  }
-
-  String formatBytes({int bytes, int decimals = 2}) {
-    if (bytes == 0) return '0 Bytes';
-
-    var k = 1024;
-    var dm = decimals < 0 ? 0 : decimals;
-    var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-
-    var i = (math.log(bytes) / math.log(k)).floor();
-
-    return (bytes / math.pow(k, i)).toStringAsFixed(dm) + " " + sizes[i];
   }
 
   @override
