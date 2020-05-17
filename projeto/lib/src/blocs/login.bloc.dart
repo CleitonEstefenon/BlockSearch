@@ -42,6 +42,7 @@ class LoginBloc {
       isAuthenticated = LoginApi.login(userLogin, userPass).then((user) {
         if (user.statusCode == 200) {
           addStringUserPreferences(SharedPreferencesKey.TOKEN, user.token);
+          addStringUserPreferences(SharedPreferencesKey.ORGANIZATION_ID, user.organization);
           addStringUserPreferences(SharedPreferencesKey.USER_NAME, user.name);
           addStringUserPreferences(SharedPreferencesKey.USER_LOGIN, user.email);
           addStringUserPreferences(SharedPreferencesKey.USER_PASS, userPass);

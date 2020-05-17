@@ -30,9 +30,7 @@ class Document {
     )
         .then((response) {
       debugPrint(response.statusCode.toString());
-      debugPrint("SUCESSO");
     }).catchError((error) {
-      debugPrint("DEU BOSTA");
       debugPrint(error);
     });
   }
