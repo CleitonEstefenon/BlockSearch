@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:projeto/src/helpers/SharedPrefKey.dart';
 import 'package:projeto/src/helpers/SharedPrefUser.dart';
@@ -12,7 +10,7 @@ class Dashboard {
         await getStringUserPreferences(SharedPreferencesKey.ORGANIZATION_ID);
 
     var url =
-        'https://blockshare-backend.herokuapp.com/dashboard/documents_by_period/${organizationid}?dataInicial=${DateTime.now().subtract(Duration(days: 7))}&dataFinal=${DateTime.now()}';
+        'https://blockshare-backend.herokuapp.com/dashboard/documents_by_period/$organizationid?dataInicial=${DateTime.now().subtract(Duration(days: 7))}&dataFinal=${DateTime.now()}';
 
     //monta o header e envia o token de autorização
     Map<String, String> header = {

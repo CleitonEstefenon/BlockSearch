@@ -14,13 +14,13 @@ class _HomeState extends State<Home> {
 
   @override
   void initState() {
+    super.initState();
     _getTransactions();
   }
 
   void _getTransactions() async {
     Dashboard().documentsByPeriod().then((response) {
       List<TransactionDashboard> transactions = [];
-
       for (var transaction in response.data["resp"]["rows"]) {
         transactions.add(TransactionDashboard.fromJson(transaction));
       }
