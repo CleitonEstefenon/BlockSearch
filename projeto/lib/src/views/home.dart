@@ -80,7 +80,7 @@ class _HomeState extends State<Home> {
           children: <Widget>[
             Chart(_recentTransactions),
             Container(
-              height: MediaQuery.of(context).size.height - 226,
+              height: MediaQuery.of(context).size.height - 236,
               child: ListView.builder(
                 controller: _scrollController,
                 itemCount: _transactions.length,
