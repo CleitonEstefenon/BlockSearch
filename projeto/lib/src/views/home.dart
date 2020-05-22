@@ -14,6 +14,7 @@ class _HomeState extends State<Home> {
   List<TransactionDashboard> _transactions = [];
 
   ScrollController _scrollController = new ScrollController();
+  var refreshNews = GlobalKey<RefreshIndicatorState>();
 
   int offset = 0;
   int count = 0;
@@ -43,6 +44,8 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> _getAllTransactions() async {
+    refreshNews.currentState?.show(atTop: false);
+
     Dashboard().findAllDocuments(offset: offset, limit: 10).then((response) {
       List<TransactionDashboard> transactions = [];
 
@@ -81,39 +84,43 @@ class _HomeState extends State<Home> {
             Chart(_recentTransactions),
             Container(
               height: MediaQuery.of(context).size.height - 226,
-              child: ListView.builder(
-                controller: _scrollController,
-                itemCount: _transactions.length,
-                itemBuilder: (BuildContext context, int index) {
-                  TransactionDashboard transaction = _transactions[index];
-                  return ListTile(
-                    leading: CircleAvatar(
-                      child: Text(
-                        transaction.confirmations > 6
-                            ? "6+"
-                            : transaction.confirmations.toString(),
+              child: RefreshIndicator(
+                key: refreshNews,
+                child: ListView.builder(
+                  controller: _scrollController,
+                  itemCount: _transactions == null ? 0 : _transactions.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    TransactionDashboard transaction = _transactions[index];
+                    return ListTile(
+                      leading: CircleAvatar(
+                        child: Text(
+                          transaction.confirmations > 5
+                              ? "6+"
+                              : transaction.confirmations.toString(),
+                        ),
                       ),
-                    ),
-                    title: transaction.confirmed
-                        ? Text(
-                            'Documento registrado',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )
-                        : Text(
-                            'Documento pendente',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                    subtitle: Text(
-                      DateUtils.dateToString(
-                        date: transaction.createdAt,
-                        format: "d MMM y - HH:mm:ss",
+                      title: transaction.confirmed
+                          ? Text(
+                              'Documento registrado',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            )
+                          : Text(
+                              'Documento pendente',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                      subtitle: Text(
+                        DateUtils.dateToString(
+                          date: transaction.createdAt,
+                          format: "d MMM y - HH:mm:ss",
+                        ),
                       ),
-                    ),
-                    trailing: transaction.confirmed
-                        ? Icon(Icons.check, color: Colors.blue)
-                        : Icon(Icons.clear, color: Colors.red),
-                  );
-                },
+                      trailing: transaction.confirmed
+                          ? Icon(Icons.check, color: Colors.blue)
+                          : Icon(Icons.clear, color: Colors.red),
+                    );
+                  },
+                ),
+                onRefresh: _getAllTransactions,
               ),
             ),
           ],
