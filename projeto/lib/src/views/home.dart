@@ -12,6 +12,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List<TransactionDashboard> _transactions = [];
+  List<TransactionDashboard> _transactionsChart = [];
 
   ScrollController _scrollController = new ScrollController();
   var refreshNews = GlobalKey<RefreshIndicatorState>();
@@ -22,7 +23,10 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+
     _getAllTransactions();
+
+    _getTransactionsByPeriod();
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
@@ -59,8 +63,21 @@ class _HomeState extends State<Home> {
     });
   }
 
+  Future<void> _getTransactionsByPeriod() async {
+    Dashboard().documentsByPeriod().then((response) {
+      List<TransactionDashboard> transactions = [];
+
+      for (var transaction in response.data["resp"]["rows"]) {
+        transactions.add(TransactionDashboard.fromJson(transaction));
+      }
+      setState(() {
+        _transactionsChart = transactions;
+      });
+    });
+  }
+
   List<TransactionDashboard> get _recentTransactions {
-    return _transactions.where((tr) {
+    return _transactionsChart.where((tr) {
       return tr.createdAt.isAfter(DateTime.now().subtract(Duration(days: 7)));
     }).toList();
   }
@@ -82,6 +99,7 @@ class _HomeState extends State<Home> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Chart(_recentTransactions),
+            // FlatButton(onPressed: _getTransactionsByPeriod, child: Text("asoiufiudfsuihdsfuih")),
             Container(
               height: MediaQuery.of(context).size.height - 236,
               child: RefreshIndicator(
