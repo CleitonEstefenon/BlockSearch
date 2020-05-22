@@ -24,6 +24,28 @@ class Dashboard {
     return await dio.get(url, options: Options(headers: header));
 
     // var transacao = TransactionDashboard.fromJson(response.data["resp"]["rows"][0]);
-    
+  }
+
+  Future findAllDocuments({int offset = 0, int limit = 10}) async {
+    //pega o token do usuário salvo na SharedPeference
+    String token = await getStringUserPreferences(SharedPreferencesKey.TOKEN);
+    String organizationid =
+        await getStringUserPreferences(SharedPreferencesKey.ORGANIZATION_ID);
+
+    var url =
+        'https://blockshare-backend.herokuapp.com/transactions/organization/$organizationid/${offset.toString()}/${limit.toString()}';
+
+    //monta o header e envia o token de autorização
+    Map<String, String> header = {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    };
+
+    //Faz o post para a API com todas as informações.
+    Dio dio = new Dio();
+
+    return await dio.get(url, options: Options(headers: header));
+
+    // var transacao = TransactionDashboard.fromJson(response.data["resp"]["rows"][0]);
   }
 }

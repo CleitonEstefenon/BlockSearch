@@ -54,10 +54,11 @@ class _SearchDocumentState extends State<SearchDocument> {
 
     DocumentBLoc().search(_sha256).then((resp) {
       if (resp.data != "") {
+        Transaction transaction = Transaction.fromJson(resp.data);
         setState(() {
           _loading = false;
           _registred = true;
-          _transaction = Transaction.fromJson(resp.data);
+          _transaction = transaction;
         });
       } else {
         setState(() {
@@ -66,7 +67,8 @@ class _SearchDocumentState extends State<SearchDocument> {
           _transaction = null;
         });
       }
-    }).catchError(() {
+    }).catchError((err) {
+      debugPrint(err);
       showMessage("Ocorreu um erro ao buscar o documento");
     });
   }

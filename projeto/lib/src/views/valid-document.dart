@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:projeto/src/models/transaction.dart';
-import 'package:intl/intl.dart';
+import 'package:projeto/src/util/date_utils.dart';
 
 class ValidDocument extends StatelessWidget {
   final Transaction transaction;
@@ -41,7 +41,7 @@ class ValidDocument extends StatelessWidget {
                         width: double.infinity,
                         padding: EdgeInsets.all(10),
                         child: Text(
-                          "Este documento foi registrado na rede Blockchain por ${transaction.document.organization.name} em ${DateFormat("dd/MM/yyyy").format(transaction.createdAt)} e não sofreu nenhuma alteração após o registro.",
+                          "Este documento foi registrado na rede Blockchain por ${transaction.document.organization.name} em ${DateUtils.dateToString(date: transaction.createdAt, format: "dd/MM/yyyy")} e não sofreu nenhuma alteração após o registro.",
                           textAlign: TextAlign. center,
                         ),
                       ),

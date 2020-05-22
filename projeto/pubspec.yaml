@@ -1,5 +1,5 @@
 name: projeto
-description: A new Flutter project.
+description: Blockchain application, integrated with Blockshare Web.
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -23,7 +23,6 @@ dependencies:
   local_auth: ^0.4.0+1
   flutter_conditional_rendering: ^1.1.1
   file_picker: 1.6.3+2
-  charts_flutter: ^0.9.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -38,11 +37,17 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons:
   
 
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+
+flutter_icons:
+  image_path: 'images/icone.png'
+  android: true
+  ios: true
 
 # The following section is specific to Flutter.
 flutter:

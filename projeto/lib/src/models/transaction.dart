@@ -1,4 +1,3 @@
-
 import 'package:projeto/src/models/Document.dart';
 import 'package:projeto/src/util/date_utils.dart';
 
@@ -13,7 +12,7 @@ class Transaction {
   Transaction.fromJson(Map<String, dynamic> json) {
     txid = json['txid'];
     confirmed = json['confirmed'];
-    createdAt = DateUtils.stringToDate(json['createdAt']);
+    createdAt = DateUtils.stringToDate(date: json['createdAt'], format: "yyyy-MM-dd");
     document = Document.fromJson(json['document']);
   }
 }
