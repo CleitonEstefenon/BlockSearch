@@ -1,5 +1,5 @@
-< xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.projeto">
+<xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.blockshare.mobile">
     <!-- Flutter needs it to communicate with the running application
          to allow setting breakpoints, to provide hot reload, etc.
     -->
